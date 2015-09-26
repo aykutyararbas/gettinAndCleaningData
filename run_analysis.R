@@ -4,6 +4,13 @@
 ## 3. Uses descriptive activity names to name the activities in the data set
 ## 4. Appropriately labels the data set with descriptive activity names.
 ## 5. Creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+if(!require("data.table")){
+  install.packages("data.table");
+}
+if(!require("reshape2")){
+  install.packages("reshape2")
+}
+
 workFolder<-"datas"
 dataSetFolder<-"UCI HAR Dataset"
 dataSetPath<-paste(getwd(),workFolder,dataSetFolder,sep = "/")
@@ -32,56 +39,53 @@ downloadData <- function() {
   }
 }
 
-# Activity files
-activityTestFile<-paste(dataSetPath,"test","y_test.txt",sep="/")
-activityTrainFile<-paste(dataSetPath,"train","y_train.txt",sep="/")
+#Activity labels  file
+activityLabelsFile<-paste(dataSetPath,"activity_labels.txt",sep="/")
+activityLabelsData<-read.table(activityLabelsFile)
 
-#Features files
+#Feature names file
+featureNamesFile<-paste(dataSetPath,"features.txt",sep="/")
+featureNameData<-read.table(featureNamesFile)
+
+#Extract mean and std from the columns
+extract_mean_std<-grepl("mean|std", featureNameData[,2])
+
+# Activity test files
+activityTestFile<-paste(dataSetPath,"test","y_test.txt",sep="/")
+#Subject test file
+subjectTestFile<-paste(dataSetPath,"test","subject_test.txt",sep="/")
+
+#Activity train file
+activityTrainFile<-paste(dataSetPath,"train","y_train.txt",sep="/")
+#Subjects train file
+subjectTrainFile<-paste(dataSetPath,"train","subject_train.txt",sep="/")
+
+#Features test files
 featuresTestFile<-paste(dataSetPath,"test","X_test.txt",sep="/")
+
+#Features train files
 featuresTrainFile<-paste(dataSetPath,"train","X_train.txt",sep="/")
 
-featureNamesFile<-paste(dataSetPath,"features.txt",sep="/")
+## Laoding data
+activityTestData <-read.table(activityTestFile)
+activityTrainData <-read.table(activityTrainFile)
 
-##Function to merge two given files
-mergeFiles<-function(filea,fileb){
-  fa<-read.table(filea, header = FALSE)
-  fb<-read.table(fileb, header = FALSE)
-  fAb<-rbind(fa,fb)
-  fAb
-}
+subjectTestData<-read.table(subjectTestFile)
+subjectTrainData<-read.table(subjectTrainFile)
 
+#Load feature test data
+featuresTestData<-read.table(featuresTestFile)
+#Rename features test data columns
+names(featuresTestData) = featureNameData[,2]
+#Extract mean and std
+featuresTestData=featuresTestData[,extract_mean_std]
 
-## Load test and train Y files ( activity files )
-mergeActivityFiles<-function(){
-  yTr<-mergeFiles(activityTestFile,activityTrainFile)
-  yTr
-}
-
-## Laod test and train X files ( features files )
-mergeFeatureFiles<-function(){
-  xTr<-mergeFiles(featuresTestFile,featuresTrainFile)
-  xTr
-}
-
-getFeatureNamesFile<-function(){
-  fn<-read.table(featureNamesFile, header = FALSE)
-  fn
-}
+#Load feature train data
+featuresTrainData<-read.table(featuresTrainFile)
+#Rename features train data columns
+names(featuresTrainData) = featureNameData[,2]
+#Extract mean and std column
+featuresTrainData=featuresTrainData[,extract_mean_std]
 
 
-extractMeanAndStandard<-function(){
-  ## Get feature names 
-  features<-mergeFeatureFiles()
-  ## Get activity files 
-  
 
-  activityFiles<-mergeActivityFiles()
-  
-  
-  #Get names for std dev and mean
-  featureNames<-getFeatureNamesFile()
-  featureNames$V2[grep("mean\\(\\)|std\\(\\)", featureNames$V2)]  
-
-  ##TODO 
-    
-}
