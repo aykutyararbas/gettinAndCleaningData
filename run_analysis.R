@@ -87,5 +87,5 @@ names(featuresTrainData) = featureNameData[,2]
 #Extract mean and std column
 featuresTrainData=featuresTrainData[,extract_mean_std]
 
-
+testData<-cbind(as.data.tab)
 
