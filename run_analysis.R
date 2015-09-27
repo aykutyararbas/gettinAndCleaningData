@@ -38,7 +38,7 @@ downloadData <- function() {
   }
 }
 
-##Construct parameters
+##STEP 1. Construct parameters
 
 workFolder<-"datas"
 dataSetFolder<-"UCI HAR Dataset"
@@ -73,7 +73,7 @@ featuresTrainFile<-paste(dataSetPath,"train","X_train.txt",sep="/")
 
 ## END of Construct parameters
 
-## Load data
+##STEP 2 Load data
 activityTestData <-read.table(activityTestFile)
 activityTrainData <-read.table(activityTrainFile)
 
@@ -85,7 +85,7 @@ featuresTestData<-read.table(featuresTestFile)
 #Load feature train data
 featuresTrainData<-read.table(featuresTrainFile)
 
-
+##STEP 3 Process data
 #3. Uses descriptive activity names to name the activities in the data set
 names(subjectTestData)=c("subject")
 names(featuresTestData) = featureNameData[,2]
@@ -119,6 +119,7 @@ ids   = c("subject", "activity", "activityName")
 dataFields = setdiff(colnames(allData), ids)
 meltedData  = melt(mergedData, id = ids, measure.vars = dataFields)
 
+#STEP 4 - Construct tidy data and write to file
 #independent tidy data set with the average of each variable 
 tidyData   = dcast(meltedData, subject + activityName ~ variable, mean)
 
