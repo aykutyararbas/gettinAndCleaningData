@@ -4,16 +4,15 @@
 ## 3. Uses descriptive activity names to name the activities in the data set
 ## 4. Appropriately labels the data set with descriptive activity names.
 ## 5. Creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+
+
+## Initialize load packages
 if(!require("data.table")){
   install.packages("data.table");
 }
 if(!require("reshape2")){
   install.packages("reshape2")
 }
-
-workFolder<-"datas"
-dataSetFolder<-"UCI HAR Dataset"
-dataSetPath<-paste(getwd(),workFolder,dataSetFolder,sep = "/")
 
 
 downloadData <- function() {
@@ -39,10 +38,16 @@ downloadData <- function() {
   }
 }
 
+##Construct parameters
+
+workFolder<-"datas"
+dataSetFolder<-"UCI HAR Dataset"
+dataSetPath<-paste(getwd(),workFolder,dataSetFolder,sep = "/")
+
 #Activity labels  file
 activityLabelsFile<-paste(dataSetPath,"activity_labels.txt",sep="/")
 activityLabelsData<-read.table(activityLabelsFile)
-
+names(activityLabelsData)=c("code","activityName")
 #Feature names file
 featureNamesFile<-paste(dataSetPath,"features.txt",sep="/")
 featureNameData<-read.table(featureNamesFile)
@@ -66,7 +71,9 @@ featuresTestFile<-paste(dataSetPath,"test","X_test.txt",sep="/")
 #Features train files
 featuresTrainFile<-paste(dataSetPath,"train","X_train.txt",sep="/")
 
-## Laoding data
+## END of Construct parameters
+
+## Load data
 activityTestData <-read.table(activityTestFile)
 activityTrainData <-read.table(activityTrainFile)
 
@@ -75,17 +82,44 @@ subjectTrainData<-read.table(subjectTrainFile)
 
 #Load feature test data
 featuresTestData<-read.table(featuresTestFile)
-#Rename features test data columns
-names(featuresTestData) = featureNameData[,2]
-#Extract mean and std
-featuresTestData=featuresTestData[,extract_mean_std]
-
 #Load feature train data
 featuresTrainData<-read.table(featuresTrainFile)
-#Rename features train data columns
+
+
+#3. Uses descriptive activity names to name the activities in the data set
+names(subjectTestData)=c("subject")
+names(featuresTestData) = featureNameData[,2]
+names(activityTestData)=c("activity")
+#2. Extracts only the measurements on the mean and standard deviation for each measurement.
+featuresTestData=featuresTestData[,extract_mean_std]
+
+
+#3. Uses descriptive activity names to name the activities in the data set
+names(subjectTrainData)=c("subject")
 names(featuresTrainData) = featureNameData[,2]
-#Extract mean and std column
+names(activityTrainData)=c("activity")
+#2. Extracts only the measurements on the mean and standard deviation for each measurement.
 featuresTrainData=featuresTrainData[,extract_mean_std]
 
-testData<-cbind(as.data.tab)
+## Bind subject, activity, and features data
+testData<-cbind(subjectTestData,activityTestData,featuresTestData)
+trainData<-cbind(subjectTrainData,activityTrainData,featuresTrainData)
 
+## 1. Merges the training and the test sets to create one data set.
+allData<-rbind(trainData, testData)
+
+## 4. Appropriately labels the data set with descriptive activity names.
+mergedData <- merge(allData,activityLabelsData, by.x = "activity", by.y = "code", all.y = FALSE, sort = TRUE)
+
+## 5. Creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+# subject
+# activityName
+# Average for each variable -- mean
+ids   = c("subject", "activity", "activityName")
+dataFields = setdiff(colnames(allData), ids)
+meltedData  = melt(mergedData, id = ids, measure.vars = dataFields)
+
+#independent tidy data set with the average of each variable 
+tidyData   = dcast(meltedData, subject + activityName ~ variable, mean)
+
+write.table(tidyData,file = '/data/rspace/gettinAndCleaningData/tidyData.txt')
