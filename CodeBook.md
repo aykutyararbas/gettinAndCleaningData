@@ -53,14 +53,14 @@ and mean of every observation in the merged sets
 4. Construct parameters
 5. Load data files into memory
 6. Process data
-6.1 Name columns for activity, subject and features
-6.2 Extract only the measurements on the mean and standard deviation for each measurement. 
-6.3 Column bind subject, activity and observation data
-6.4 Merge test and train data
-6.5 Add activity names for each activity
-6.6 Melt , organize data by, subject , activity
-6.7 Create tidyData , cast averages for each observation for each subject and activity
-6.8 Write data to tidyData.txt
+6.1. Name columns for activity, subject and features
+6.2. Extract only the measurements on the mean and standard deviation for each measurement. 
+6.3. Column bind subject, activity and observation data
+6.4. Merge test and train data
+6.5. Add activity names for each activity
+6.6. Melt , organize data by, subject , activity
+6.7. Create tidyData , cast averages for each observation for each subject and activity
+6.8. Write data to tidyData.txt
 
 7. Write data
 
